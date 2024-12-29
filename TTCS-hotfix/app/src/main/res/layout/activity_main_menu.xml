@@ -157,8 +157,8 @@
                     <Button
                         android:layout_width="80dp"
                         android:layout_height="86dp"
-                        android:id="@+id/loptinchi"
-                          android:background="@drawable/loptinchi"
+                        android:id="@+id/tientrinhhoc"
+                        android:background="@drawable/loptinchi"
                         />
 
                     <TextView
@@ -182,7 +182,6 @@
                     <Button
                         android:layout_width="82dp"
                         android:layout_height="89dp"
-                        android:id="@+id/tientrinhhoc"
                         android:background="@drawable/tientrinh"
                         app:tint="@color/red_primary" />
 
