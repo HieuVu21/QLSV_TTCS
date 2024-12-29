@@ -7,47 +7,33 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class CourseResultAdapter(private val courseResults: List<CourseResult>) :
-    RecyclerView.Adapter<CourseResultAdapter.CourseResultViewHolder>() {
+class CourseResultAdapter(private var courses: List<CourseResult>) :
+    RecyclerView.Adapter<CourseResultAdapter.CourseViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseResultViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_course_result, parent, false)
-        return CourseResultViewHolder(view)
-    }
+    class CourseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val courseNameTextView: TextView = view.findViewById(R.id.courseNameTextView)
+        private val creditCountTextView: TextView = view.findViewById(R.id.creditCountTextView)
 
-    override fun onBindViewHolder(holder: CourseResultViewHolder, position: Int) {
-        val courseResult = courseResults[position]
-        holder.bind(courseResult)
-    }
-
-    override fun getItemCount(): Int = courseResults.size
-
-    class CourseResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val courseNameTextView: TextView = itemView.findViewById(R.id.courseNameTextView)
-        private val courseCreditsTextView: TextView = itemView.findViewById(R.id.courseCreditsTextView)
-        private val courseGpa4TextView: TextView = itemView.findViewById(R.id.courseGpa4TextView)
-        private val courseGpa10TextView: TextView = itemView.findViewById(R.id.courseGpa10TextView)
-        private val componentsContainer: LinearLayout = itemView.findViewById(R.id.componentsContainer)
-
-        fun bind(courseResult: CourseResult) {
-            courseNameTextView.text = courseResult.name
-            courseCreditsTextView.text = "Credits: ${courseResult.number_of_credits}"
-            courseGpa4TextView.text = "GPA (4 Scale): ${courseResult.gpa_4_scale}"
-            courseGpa10TextView.text = "GPA (10 Scale): ${courseResult.gpa_10_scale}"
-
-            // Clear previous components to avoid duplication
-            componentsContainer.removeAllViews()
-
-            // Add each component score dynamically
-            courseResult.component_score?.forEach { component ->
-                val componentTextView = TextView(itemView.context).apply {
-                    text = "${component.name}: Weight ${component.score_weight}, Score ${component.score}"
-                    textSize = 14f
-                    setPadding(0, 4, 0, 4)
-                }
-                componentsContainer.addView(componentTextView)
-            }
+        fun bind(course: CourseResult) {
+            courseNameTextView.text = course.name
+            creditCountTextView.text = "${course.number_of_credits} tín chỉ"
         }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_course, parent, false)
+        return CourseViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: CourseViewHolder, position: Int) {
+        holder.bind(courses[position])
+    }
+
+    override fun getItemCount() = courses.size
+
+    fun updateCourses(newCourses: List<CourseResult>) {
+        courses = newCourses
+        notifyDataSetChanged()
     }
 }

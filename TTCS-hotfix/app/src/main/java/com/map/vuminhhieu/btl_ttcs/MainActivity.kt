@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
                         Toast.makeText(this@MainActivity, "Đăng nhập thành công", Toast.LENGTH_SHORT).show()
                         Log.d("LoginSuccess", "Login successful with token: $token")
 
-                    val intent = Intent(this@MainActivity, ScoreActivity::class.java)
+                    val intent = Intent(this@MainActivity, MenuActivity::class.java)
                     intent.putExtra("token", token) // Pass the token if needed
                     startActivity(intent)
 

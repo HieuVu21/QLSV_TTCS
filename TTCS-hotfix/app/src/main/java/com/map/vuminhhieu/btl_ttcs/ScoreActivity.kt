@@ -10,6 +10,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import retrofit2.Call
@@ -19,116 +20,47 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class ScoreActivity : ComponentActivity() {
-    private lateinit var authApi: AuthApi
-    private lateinit var currentGpaTextView: TextView
-    private lateinit var predictedGpaTextView: TextView
-    private lateinit var selectedSemesterGpaTextView: TextView
+    private lateinit var coursesRecyclerView: RecyclerView
     private lateinit var semesterSpinner: Spinner
-    private lateinit var courseRecyclerView: RecyclerView
-    private lateinit var viewChartButton: Button
-    private var semesters: List<Semester> = emptyList()
+    private lateinit var courseAdapter: CourseResultAdapter
+    private var semesters: List<Semester> = listOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_score)
 
         // Initialize views
-        currentGpaTextView = findViewById(R.id.currentGpaTextView)
-        predictedGpaTextView = findViewById(R.id.predictedGpaTextView)
-        selectedSemesterGpaTextView = findViewById(R.id.selectedSemesterGpaTextView)
+        coursesRecyclerView = findViewById(R.id.coursesRecyclerView)
         semesterSpinner = findViewById(R.id.semesterSpinner)
-        courseRecyclerView = findViewById(R.id.courseRecyclerView)
-        viewChartButton = findViewById(R.id.viewChartButton)
 
         // Setup RecyclerView
-        courseRecyclerView.layoutManager = LinearLayoutManager(this)
+        coursesRecyclerView.layoutManager = GridLayoutManager(this, 2)
+        courseAdapter = CourseResultAdapter(emptyList())
+        coursesRecyclerView.adapter = courseAdapter
 
-        // Handle "View GPA Chart" button click
-        viewChartButton.setOnClickListener {
-            if (semesters.isNotEmpty()) {
-                val semesterGpas = semesters.map { it.gpa.toFloat() }.toFloatArray()
-                val intent = Intent(this, GpaChartActivity::class.java).apply {
-                    putExtra("semester_gpas", semesterGpas)
-                }
-                startActivity(intent)
-            } else {
-                Toast.makeText(this, "No GPA data available to display", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        // Get the token from Intent
+        // Get token from intent
         val token = intent.getStringExtra("token") ?: ""
 
-        // Initialize Retrofit
+        // Initialize Retrofit and fetch data
         val retrofit = Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8080/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        authApi = retrofit.create(AuthApi::class.java)
-        fetchGpaDetails(token)
+        val authApi = retrofit.create(AuthApi::class.java)
+        fetchGpaDetails(authApi, token)
     }
 
-    private fun setupSpinner(semesters: List<Semester>) {
-        // Create spinner items
-        val spinnerItems = semesters.map {
-            "Semester ${it.semester_number} (${it.academic_year})"
-        }
-
-        // Create and set adapter for spinner
-        val spinnerAdapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_item,
-            spinnerItems
-        ).apply {
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        }
-
-        semesterSpinner.adapter = spinnerAdapter
-
-        // Handle spinner item selection
-        semesterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedSemester = semesters[position]
-                updateSemesterDetails(selectedSemester)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // Optional: Handle case when nothing is selected
-            }
-        }
-    }
-
-    private fun updateSemesterDetails(semester: Semester) {
-        // Update semester GPA
-        selectedSemesterGpaTextView.text = "Semester GPA: ${semester.gpa}"
-
-        // Update course list
-        val courseAdapter = CourseResultAdapter(semester.course_results)
-        courseRecyclerView.adapter = courseAdapter
-    }
-
-    private fun fetchGpaDetails(token: String) {
+    private fun fetchGpaDetails(authApi: AuthApi, token: String) {
         authApi.getGpaDetail("Bearer $token").enqueue(object : Callback<GpaResponse> {
             override fun onResponse(call: Call<GpaResponse>, response: Response<GpaResponse>) {
                 if (response.isSuccessful) {
-                    val gpaResponse = response.body()
-                    gpaResponse?.let {
-                        // Display overall GPA details
-                        currentGpaTextView.text = "Current GPA: ${it.current_gpa}"
-                        predictedGpaTextView.text = "Predicted GPA: ${it.predicted_next_semester_gpa}"
-
-                        // Store semesters and setup spinner
-                        semesters = it.semesters
-                        setupSpinner(semesters)
-
-                        // Select first semester by default
-                        if (semesters.isNotEmpty()) {
-                            updateSemesterDetails(semesters[0])
-                        }
+                    response.body()?.let { gpaResponse ->
+                        semesters = gpaResponse.semesters
+                        setupSpinner()
                     }
                 } else {
-                    Toast.makeText(this@ScoreActivity, "Failed to retrieve GPA details", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ScoreActivity, "Failed to retrieve data", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -137,4 +69,20 @@ class ScoreActivity : ComponentActivity() {
             }
         })
     }
+
+    private fun setupSpinner() {
+        val semesterTitles = semesters.map { "Học kỳ ${it.semester_number} Năm học ${it.academic_year}" }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, semesterTitles)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        semesterSpinner.adapter = adapter
+        semesterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                courseAdapter.updateCourses(semesters[position].course_results)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
 }
+
