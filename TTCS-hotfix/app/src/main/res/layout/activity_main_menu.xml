@@ -182,15 +182,15 @@
                     <Button
                         android:layout_width="82dp"
                         android:layout_height="89dp"
-                        android:id="@+id/lophanhchinh"
-                        android:background="@drawable/lophanhchinh"
+                        android:id="@+id/tientrinhhoc"
+                        android:background="@drawable/tientrinh"
                         app:tint="@color/red_primary" />
 
                     <TextView
                         android:layout_width="61dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Lớp hành chính"
+                        android:text="Tiến trình học tập"
                         android:textColor="@color/red_primary"
                         android:textAlignment="center" />
                 </LinearLayout>

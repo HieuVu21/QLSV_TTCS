@@ -21,7 +21,7 @@ class MenuActivity : ComponentActivity() {
         // Find the "Kết quả học tập" button
         val scoreButton = findViewById<Button>(R.id.ketquahoctap)
         val aiButton = findViewById<Button>(R.id.chatbot)
-
+        val tientrinh = findViewById<Button>(R.id.tientrinhhoc)
         aiButton.setOnClickListener {
             val intent = Intent(this, ChatActivity::class.java)
             startActivity(intent)
@@ -30,6 +30,12 @@ class MenuActivity : ComponentActivity() {
         scoreButton.setOnClickListener {
             // Navigate to ScoreActivity with token
             val intent = Intent(this, ScoreActivity::class.java)
+            intent.putExtra("token", token)
+            startActivity(intent)
+        }
+        tientrinh.setOnClickListener {
+            // Navigate to ScoreActivity with token
+            val intent = Intent(this, PieChartActivity::class.java)
             intent.putExtra("token", token)
             startActivity(intent)
         }

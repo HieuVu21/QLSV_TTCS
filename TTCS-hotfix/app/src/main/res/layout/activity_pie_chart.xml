@@ -1,0 +1,33 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Spinner để chọn kỳ học -->
+    <Spinner
+        android:id="@+id/semesterSpinner"
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content" />
+
+    <!-- Biểu đồ tròn hiển thị tổng tín chỉ -->
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChart"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
+
+    <!-- Biểu đồ tròn hiển thị GPA theo môn -->
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/subjectPieChart"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
+
+    <!-- Hiển thị tổng số tín chỉ đã học -->
+    <TextView
+        android:id="@+id/totalCreditsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tín chỉ đã học: "
+        android:textSize="18sp" />
+</LinearLayout>
