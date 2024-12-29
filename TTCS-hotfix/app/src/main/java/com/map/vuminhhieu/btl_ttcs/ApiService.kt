@@ -26,7 +26,12 @@ data class Semester(
     val course_results: List<CourseResult>
 )
 
-data class CourseResult(
+    data class ChatResponse(
+        val answer: String,
+        val question: String
+    )
+
+    data class CourseResult(
     val name: String,
     val number_of_credits: Int,
     val gpa_4_scale: Double,
@@ -48,4 +53,6 @@ interface AuthApi {
 
     @GET("/gpa/detail")
     fun getGpaDetail(@Header("Authorization") token: String): Call<GpaResponse>
+    @POST("/ask-question")
+    fun askQuestion(@Body question: Map<String, String>): Call<ChatResponse>
 }

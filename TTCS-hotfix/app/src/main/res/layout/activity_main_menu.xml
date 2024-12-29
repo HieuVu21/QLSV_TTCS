@@ -238,6 +238,7 @@
                     <Button
                         android:layout_width="84dp"
                         android:layout_height="91dp"
+                        android:id="@+id/chatbot"
                         android:background="@drawable/ai"
                         app:tint="@color/red_primary" />
 
